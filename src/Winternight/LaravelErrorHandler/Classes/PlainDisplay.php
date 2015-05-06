@@ -109,9 +109,15 @@ class PlainDisplay implements DisplayContract {
 	 * @return array
 	 */
 	protected function info( $code, Exception $exception ) {
+		$description = $exception->getMessage();
+		
+		// If there is no error message for the given HTTP code, default to 500.
+		if( ! $this->lang->has( "winternight/laravel-error-handler::messages.error.{$code}.name" ) ) {
+			$code = 500;
+		}
+		
 		$name        = $this->lang->get( "winternight/laravel-error-handler::messages.error.{$code}.name" );
 		$message     = $this->lang->get( "winternight/laravel-error-handler::messages.error.{$code}.message" );
-		$description = $exception->getMessage();
 
 		return compact( 'code', 'name', 'message', 'description' );
 	}
