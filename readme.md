@@ -4,8 +4,8 @@ Unlike version 4, Laravel 5 no longer uses [Whoops](https://github.com/filp/whoo
 the box and instead relies on the Symfony error handler, which is far less
 informative for developers.
 
-This packages provides an easy way to get [Whoops](https://github.com/filp/whoops "filp/whoops") error handling back in
-your Laravel 5 project, along with a few other goodies.
+This packages provides a convenient way to get the more informative [Whoops](https://github.com/filp/whoops "filp/whoops") 
+error messages back in your Laravel 5 project, along with a few other goodies.
 
 ![Exception](screenshot.png "The Whoops Error Handler in Action!" )
 
@@ -23,14 +23,14 @@ First open up your `composer.json` and add the `laravel-whoops` package.
 
 ```json
 "require": {
-	"winternight/laravel-whoops": "~1.0@dev"
+	"winternight/laravel-error-handler": "~1.0@dev"
 },
 ```
 
 Run `composer update` in your project root and wait for the package to download. Then, add the service provider in your 
 `config/app.php` :
 
-```
+```php
 'Winternight\LaravelErrorHandler\ServiceProvider',
 ```
 
@@ -45,11 +45,11 @@ To make sure you also catch any exceptions thrown during the bootstrap you must 
 
 $app->singleton(
  	'Illuminate\Contracts\Debug\ExceptionHandler',
- 	'Winternight\LaravelErrorHandler\Handlers\WhoopsExceptionHandler'
+ 	'Winternight\LaravelErrorHandler\Handlers\ExceptionHandler'
 );
 ```
 
-Thats it -- better error handling for your Laravel 5 project!
+Thats it — better error handling for your Laravel 5 project!
 
 ## Usage
 
