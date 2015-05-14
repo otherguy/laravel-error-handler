@@ -1,3 +1,5 @@
+[![Latest Stable Version](https://img.shields.io/packagist/v/winternight/laravel-error-handler.svg?style=flat-square)](https://packagist.org/packages/winternight/laravel-error-handler) [![License](https://img.shields.io/dub/l/vibe-d.svg?style=flat-square)](license.md) [![Downloads](https://img.shields.io/packagist/dt/winternight/laravel-error-handler.svg?style=flat-square)](https://packagist.org/packages/winternight/laravel-error-handler)
+
 # Laravel 5 Error Handler
 
 Unlike version 4, Laravel 5 no longer uses [Whoops](https://github.com/filp/whoops "filp/whoops") error handling out of
