@@ -94,7 +94,7 @@ class PlainDisplay implements DisplayContract {
 
 		// If it's a HTTP Exception and there is a custom view, use that.
 		if( ( $exception instanceof HttpException || $exception instanceof ModelNotFoundException ) && $this->view->exists( "errors.{$code}" ) ) {
-			return $this->view->make( "errors.{$exception->getStatusCode()}", $info )->render();
+			return $this->view->make( "errors.{$code}", $info )->render();
 		}
 
 		// If the configured default error view (or errors.error) exists, render that.
