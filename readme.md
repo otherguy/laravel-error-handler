@@ -21,7 +21,7 @@ error messages back in your Laravel 5 project, along with a few other goodies.
 
 ## Installation
 
-First open up your `composer.json` and add the `laravel-whoops` package.
+First open up your `composer.json` and add the `laravel-error-handler` package.
 
 ```json
 "require": {

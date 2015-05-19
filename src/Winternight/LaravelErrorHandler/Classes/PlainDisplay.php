@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\Factory as View;
 use Illuminate\Contracts\Routing\ResponseFactory as Response;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Winternight\LaravelErrorHandler\Contracts\DisplayContract;
 
@@ -85,9 +86,14 @@ class PlainDisplay implements DisplayContract {
 		if( (boolean)( $this->request instanceof Request && $this->request->ajax() ) == true ) {
 			return JsonResponse::create( [ 'error' => $info ], $code );
 		}
+		
+		// For model-not-found, use 404 errors.
+		if( $exception instanceof ModelNotFoundException ) {
+			$code = 404;
+		}
 
 		// If it's a HTTP Exception and there is a custom view, use that.
-		if( $exception instanceof HttpException && $this->view->exists( "errors.{$code}" ) ) {
+		if( ( $exception instanceof HttpException || $exception instanceof ModelNotFoundException ) && $this->view->exists( "errors.{$code}" ) ) {
 			return $this->view->make( "errors.{$exception->getStatusCode()}", $info )->render();
 		}
 
