@@ -94,10 +94,16 @@ Whoops error handler.
 
 ## Events
 
+Whenever an error occurs, an `ExceptionEvent` is raised. You can use your `EventServiceProvider` to listen to this type
+of event if you wish:
+
+
 ```php
-\Event::listen( 'Winternight\LaravelErrorHandler\Events\ExceptionEvent', function ( $e ) {
-	\Debugbar::addException( $e->getException() );
-} );
+    protected $listen = [
+        'Winternight\LaravelErrorHandler\Events\ExceptionEvent' => [
+            'App\Listeners\ExceptionEventListener',
+        ],
+    ];
 ```
 
 ## Is this compatible with [Laravel Debug Bar](https://github.com/barryvdh/laravel-debugbar "barryvdh/laravel-debugbar")?
