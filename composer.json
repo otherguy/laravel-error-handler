@@ -1,7 +1,7 @@
 {
-	"name": "winternight/laravel-error-handler",
+	"name": "darkwinternight/laravel-error-handler",
 	"description": "Error handler package for the Laravel 5 framework",
-	"homepage": "https://stash.treadstone.co/projects/L5/repos/laravel-error-handler/browse",
+	"homepage": "https://github.com/darkwinternight/laravel-error-handler",
 	"keywords": [ "errorhandler", "error", "exception", "debug", "laravel", "laravel 5", "whoops", "ajax" ],
 	"license": "MIT",
 	"authors": [
@@ -11,10 +11,10 @@
 		}
 	],
 	"require": {
-		"php": ">=5.4.0",
-		"filp/whoops": "1.*",
-		"laravel/framework": "5.0.*|5.1.*|5.2.*",
-		"illuminate/support": "5.0.*|5.1.*|5.2.*"
+		"php": ">=5.6.0",
+		"filp/whoops": "2.1",
+		"laravel/framework": "5.2.*|5.3.*",
+		"illuminate/support": "5.2.*|5.3.*"
 	},
 	"autoload": {
 		"psr-4": {

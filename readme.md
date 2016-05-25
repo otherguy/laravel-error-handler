@@ -33,7 +33,9 @@ Run `composer update` in your project root and wait for the package to download.
 `config/app.php` :
 
 ```php
-'Winternight\LaravelErrorHandler\ServiceProvider',
+...
+Winternight\LaravelErrorHandler\ServiceProvider::class,
+...
 ```
 
 To make sure you also catch any exceptions thrown during the bootstrap you must change the binding in 
@@ -41,13 +43,13 @@ To make sure you also catch any exceptions thrown during the bootstrap you must 
 
 ```php
 // $app->singleton(
-//    'Illuminate\Contracts\Debug\ExceptionHandler',
-//    'App\Exceptions\Handler'
+//    Illuminate\Contracts\Debug\ExceptionHandler::class,
+//    App\Exceptions\Handler::class
 // );
 
 $app->singleton(
- 	'Illuminate\Contracts\Debug\ExceptionHandler',
- 	'Winternight\LaravelErrorHandler\Handlers\ExceptionHandler'
+    Illuminate\Contracts\Debug\ExceptionHandler::class,
+    Winternight\LaravelErrorHandler\Handlers\ExceptionHandler::class
 );
 ```
 

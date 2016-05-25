@@ -1,52 +1,56 @@
 <?php namespace Winternight\LaravelErrorHandler;
 
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Winternight\LaravelErrorHandler\Handlers\ExceptionHandler;
 
 /**
  * Class ServiceProvider.
  *
  * @package Winternight\LaravelErrorHandler
  */
-class ServiceProvider extends BaseServiceProvider {
+class ServiceProvider extends BaseServiceProvider
+{
+    /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var boolean
+     */
+    protected $defer = false;
 
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var boolean
-	 */
-	protected $defer = false;
+    /**
+     * The namespace of the loaded config files.
+     *
+     * @var string
+     */
+    protected $namespace = 'winternight/laravel-error-handler';
 
-	/**
-	 * The namespace of the loaded config files.
-	 *
-	 * @var string
-	 */
-	protected $namespace = 'winternight/laravel-error-handler';
+    /**
+     * Register the service provider.
+     */
+    public function register()
+    {
+        $this->app->singleton(
+            ExceptionHandlerContract::class,
+            ExceptionHandler::class
+        );
+    }
 
+    /**
+     * Registers resources for the package.
+     */
+    public function boot()
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/../../../resources/lang/', $this->namespace);
+    }
 
-	/**
-	 * Register the service provider.
-	 */
-	public function register() {
-		$this->app->singleton(
-			'Illuminate\Contracts\Debug\ExceptionHandler',
-			'Winternight\LaravelErrorHandler\Handlers\ExceptionHandler'
-		);
-	}
-
-	/**
-	 * Registers resources for the package.
-	 */
-	public function boot() {
-		$this->loadTranslationsFrom( __DIR__ . '/../../../resources/lang/', $this->namespace );
-	}
-
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides() {
-		return [ 'Illuminate\Contracts\Debug\ExceptionHandler' ];
-	}
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return ['Illuminate\Contracts\Debug\ExceptionHandler'];
+    }
 }
