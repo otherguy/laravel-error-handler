@@ -50,6 +50,7 @@ class ExceptionHandler extends BaseExceptionHandler
         HttpException::class,
         ModelNotFoundException::class,
         ValidationException::class,
+        \Illuminate\Foundation\Validation\ValidationException::class,
     ];
 
     /**
@@ -81,7 +82,9 @@ class ExceptionHandler extends BaseExceptionHandler
      */
     public function report(Exception $e)
     {
-        $this->event->fire(new ExceptionEvent($e));
+        if ($this->shouldReport($e)) {
+            $this->event->fire(new ExceptionEvent($e));
+        }
         parent::report($e);
     }
 
@@ -102,11 +105,11 @@ class ExceptionHandler extends BaseExceptionHandler
         $response = $this->getContent($exception, $code, $request);
 
         // If it's already a response, return that.
-        if ($response instanceof BaseResponse) {
-            return $response;
+        if (!$response instanceof BaseResponse) {
+            $response = new Response($this->getContent($exception, $code, $request), $code, $headers);
         }
 
-        return new Response($this->getContent($exception, $code, $request), $code, $headers);
+        return $this->toIlluminateResponse($response, $flattened);
     }
 
     /**
