@@ -25,7 +25,7 @@ First open up your `composer.json` and add the `laravel-error-handler` package.
 
 ```json
 "require": {
-	"winternight/laravel-error-handler": "~1.0@dev"
+    "winternight/laravel-error-handler": "~1.0@dev"
 },
 ```
 
@@ -74,8 +74,8 @@ can set a view in `config/view.php` like this (this example would use the `views
 
 ```php
 return [
-	// ...
-	'error'    => 'errors.exception',
+    // ...
+    'error' => 'errors.exception',
 ];
 ```
 
@@ -87,7 +87,7 @@ automatically.
 
 ### Maintenance Mode
 
-By default, Laravel [uses a custom view](http://laravel.com/docs/5.0/configuration#maintenance-mode) in maintenance mode
+By default, Laravel [uses a custom view](https://laravel.com/docs/5.2/configuration#maintenance-mode) in maintenance mode
 to make it easy to disable your application while it's updating. The default template for maintenance mode responses is 
 located in `views/errors/503.blade.php`. If you remove that file, this package still has you covered: Laravel's 
 maintenance mode simply throws an exception with a `503` HTTP status code, so you will be shown the default error view 
@@ -116,7 +116,7 @@ in your `EventServiceProvider`'s `boot()` method:
 
 ```php
 \Event::listen( 'Winternight\LaravelErrorHandler\Events\ExceptionEvent', function ( $event ) {
-	\Debugbar::addException( $event->getException() );
+    \Debugbar::addException( $event->getException() );
 } );
 ```
 
@@ -141,7 +141,7 @@ Here is a (very) simple jQuery snippet for global AJAX error handling:
 
 ```js
 $( document ).ajaxError(function( evt, xhr ) {
-	console.log( xhr.responseJSON.error );
+    console.log( xhr.responseJSON.error );
 } );
 ```
 
