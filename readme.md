@@ -25,7 +25,7 @@ First open up your `composer.json` and add the `laravel-error-handler` package.
 
 ```json
 "require": {
-    "winternight/laravel-error-handler": "~1.0@dev"
+    "winternight/laravel-error-handler": "^1.1"
 },
 ```
 
