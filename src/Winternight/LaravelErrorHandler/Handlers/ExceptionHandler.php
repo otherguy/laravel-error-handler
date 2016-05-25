@@ -50,7 +50,6 @@ class ExceptionHandler extends BaseExceptionHandler
         HttpException::class,
         ModelNotFoundException::class,
         ValidationException::class,
-        \Illuminate\Foundation\Validation\ValidationException::class,
     ];
 
     /**
@@ -109,7 +108,7 @@ class ExceptionHandler extends BaseExceptionHandler
             $response = new Response($this->getContent($exception, $code, $request), $code, $headers);
         }
 
-        return $this->toIlluminateResponse($response, $flattened);
+        return $response;
     }
 
     /**
