@@ -2,11 +2,9 @@
 
 use Exception;
 
-use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Contracts\Events\Dispatcher as Event;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Exceptions\Handler as BaseExceptionHandler;
 
+use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -20,9 +18,14 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Winternight\LaravelErrorHandler\Classes\PlainDisplay;
 use Winternight\LaravelErrorHandler\Classes\DebugDisplay;
 use Winternight\LaravelErrorHandler\Events\ExceptionEvent;
+
+use Illuminate\Contracts\Container\Container;
+
+use Whoops\Run as Whoops;
 
 /**
  * Class ExceptionHandler.
@@ -40,33 +43,22 @@ class ExceptionHandler extends BaseExceptionHandler
     /** @var \Illuminate\Contracts\Events\Dispatcher */
     protected $event;
 
-    /**
-     * A list of the exception types that should not be reported.
-     *
-     * @var array
-     */
-    protected $dontReport = [
-        AuthorizationException::class,
-        HttpException::class,
-        ModelNotFoundException::class,
-        ValidationException::class,
-    ];
+    /** @var \Illuminate\Contracts\Container\Container */
+    protected $container;
 
     /**
      * Create a new exception handler instance.
      *
-     * @param \Psr\Log\LoggerInterface                     $log
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     * @param \Illuminate\Contracts\Config\Repository      $config
-     * @param \Illuminate\Contracts\Events\Dispatcher      $event
+     * @param \Illuminate\Contracts\Container\Container $container
      */
-    public function __construct(LoggerInterface $log, Application $app, Config $config, Event $event)
+    public function __construct(Container $container)
     {
-        $this->config = $config;
-        $this->app    = $app;
-        $this->event  = $event;
+        $this->config    = $container->config;
+        $this->app       = $container->app;
+        $this->event     = $container->events;
+        $this->container = $container;
 
-        parent::__construct($log);
+        parent::__construct($container->make(LoggerInterface::class));
     }
 
     /**
@@ -97,6 +89,16 @@ class ExceptionHandler extends BaseExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof HttpResponseException) {
+            return $exception->getResponse();
+        } elseif ($exception instanceof ModelNotFoundException) {
+            $exception = new NotFoundHttpException($exception->getMessage(), $exception);
+        } elseif ($exception instanceof AuthorizationException) {
+            $exception = new HttpException(403, $exception->getMessage());
+        } elseif ($exception instanceof ValidationException && $exception->getResponse()) {
+            return $exception->getResponse();
+        }
+
         $flattened = FlattenException::create($exception);
 
         $code     = $flattened->getStatusCode();
@@ -123,9 +125,15 @@ class ExceptionHandler extends BaseExceptionHandler
     protected function getContent(Exception $exception, $code, Request $request)
     {
 
-        // In debug mode, use the DebugDisplay class.
+        // Only if the debug mode is enabled, show a more verbose error message.
         if ((boolean)$this->config->get('app.debug') === true) {
-            return $this->app->make(DebugDisplay::class)->setRequest($request)->display($exception, $code);
+            if (class_exists(Whoops::class)) {
+                // If Whoops is loaded, use the DebugDisplay class.
+                return $this->app->make(DebugDisplay::class)->setRequest($request)->display($exception, $code);
+            } else {
+                // Fall back to the default Laravel error response.
+                return $this->toIlluminateResponse($this->convertExceptionToResponse($exception), $exception);
+            }
         }
 
         // For production/non-debug environments, use the PlainDisplay class.

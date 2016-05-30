@@ -1,8 +1,6 @@
 <?php namespace Winternight\LaravelErrorHandler;
 
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Winternight\LaravelErrorHandler\Handlers\ExceptionHandler;
 
 /**
  * Class ServiceProvider.
@@ -23,18 +21,7 @@ class ServiceProvider extends BaseServiceProvider
      *
      * @var string
      */
-    protected $namespace = 'winternight/laravel-error-handler';
-
-    /**
-     * Register the service provider.
-     */
-    public function register()
-    {
-        $this->app->singleton(
-            ExceptionHandlerContract::class,
-            ExceptionHandler::class
-        );
-    }
+    public $namespace = 'winternight/laravel-error-handler';
 
     /**
      * Registers resources for the package.
@@ -52,5 +39,14 @@ class ServiceProvider extends BaseServiceProvider
     public function provides()
     {
         return ['Illuminate\Contracts\Debug\ExceptionHandler'];
+    }
+
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
     }
 }

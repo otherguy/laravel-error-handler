@@ -13,7 +13,7 @@ error messages back in your Laravel 5 project, along with a few other goodies.
 
 ## Features
 
-* [Whoops](https://github.com/filp/whoops "filp/whoops") exception handler in debug mode
+* Optional [Whoops](https://github.com/filp/whoops "filp/whoops") 1.1 or 2.1 exception handler in debug mode
 * Standard (and configurable) error views in production mode
 * Provides AJAX-compatible JSON error responses in case of an exception (including HTTP exceptions)
 * Fires an event for each exception, providing full access to the exception
@@ -21,16 +21,33 @@ error messages back in your Laravel 5 project, along with a few other goodies.
 
 ## Installation
 
-First open up your `composer.json` and add the `laravel-error-handler` package.
+To get the latest version of Laravel Error Handler, simply require the project using Composer:
+
+```bash
+$ composer require winternight/laravel-error-handler
+```
+
+Instead you can of course manually update the `require` block in your `composer.json` and add the `laravel-error-handler` package.
 
 ```json
 "require": {
-    "winternight/laravel-error-handler": "^1.1"
+    "winternight/laravel-error-handler": "^1"
 },
 ```
 
-Run `composer update` in your project root and wait for the package to download. Then, add the service provider in your 
-`config/app.php` :
+### Whoops
+
+Whoops itself is an optional dependency and you can do without Whoops on production. To install it, simply run:
+
+```bash
+$ composer require filp/whoops --dev
+```
+
+Both Whoops `^1.1` and `^2.1` are supported but I strongly recommend you use the latest version, especially if you already use PHP 7.
+
+## Configuration 
+
+Add the service provider in your `config/app.php` :
 
 ```php
 ...
@@ -38,19 +55,22 @@ Winternight\LaravelErrorHandler\ServiceProvider::class,
 ...
 ```
 
-To make sure you also catch any exceptions thrown during the bootstrap you must change the binding in 
-`bootstrap/app.php` like this:
+You then need to change your `App\Exceptions\Handler` class to extend `Winternight\LaravelErrorHandler\Handlers\ExceptionHandler` rather than extending `Illuminate\Foundation\Exceptions\Handler`.
 
 ```php
-// $app->singleton(
-//    Illuminate\Contracts\Debug\ExceptionHandler::class,
-//    App\Exceptions\Handler::class
-// );
+<?php namespace App\Exceptions;
 
-$app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    Winternight\LaravelErrorHandler\Handlers\ExceptionHandler::class
-);
+use Exception;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+use Winternight\LaravelErrorHandler\Handlers\ExceptionHandler as ExceptionHandler;
+
+class Handler extends ExceptionHandler
+{
+...
 ```
 
 Thats it — better error handling for your Laravel 5 project!
@@ -58,7 +78,7 @@ Thats it — better error handling for your Laravel 5 project!
 ## Usage
 
 Normally, you don't have to do anything special. As long as debug mode is enabled in your Laravel application (that is, 
-`app.debug` is set to `true`), you should see the Whoops error handler.
+`app.debug` is set to `true`) and Whoops is installed, you should see the Whoops error handler.
 
 ### Debug Mode vs. Plain Mode
 
@@ -66,6 +86,8 @@ In debug mode, the Whoops handler is being shown. Since it exposes a lot of info
 code and potentially even passwords to your database and other services (depending on what you store in your `.env` file
 and thus your environment variables), debug mode should never, *ever* be enabled on a production environment (or any 
 environment that is exposed to the outside world).
+
+If `app.debug` is enabled and Whoops is not installed, it will fall back to the Laravel 5 way of displaying exceptions.
 
 Because you will proably need pretty error pages for your application anyway, this package takes care of that for you. 
 If debug mode is disabled (`app.debug` is set to `false`), an error view is rendered instead. By default, the view being
@@ -127,7 +149,8 @@ debugging disabled. That means that Laravel will (and should) not disclose any d
 occurred. It's for your own protection.
 
 To enable Whoops, open up your `config/app.php` configuration file, find the `debug` setting and change it to `true`. As
-soon as you encounter an error, you will see the Whoops error handler.
+soon as you encounter an error, you will see the Whoops error handler. If you have done everything right, you should
+probably use the `.env` file to set the `APP_DEBUG` environment variable.
 
 ## What about AJAX requests?
 
@@ -144,6 +167,10 @@ $( document ).ajaxError(function( evt, xhr ) {
     console.log( xhr.responseJSON.error );
 } );
 ```
+
+The JSON object will always contain an `error` property which in turn will always at least contain the `type` and `message`
+properties. If debug mode is enabled, it will additionally contain the `file` and `line` properties and -- in case of an 
+Exception -- also the `trace` property. The `trace` property contains the full exception stack trace.
 
 ## What about errors in the console?
 

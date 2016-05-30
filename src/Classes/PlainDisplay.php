@@ -4,12 +4,12 @@ use Exception;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Translation\Translator as Lang;
 
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\View\Factory as View;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Winternight\LaravelErrorHandler\Contracts\DisplayContract;
@@ -75,8 +75,13 @@ class PlainDisplay implements DisplayContract
         $info = $this->info($code, $exception);
 
         // Is the current request an AJAX request?
-        if ((boolean)($this->request instanceof Request && $this->request->ajax()) == true) {
-            return JsonResponse::create(['error' => $info], $code);
+        if ((boolean)($this->request instanceof Request && $this->request->wantsJson()) == true) {
+            $json_object = (object)[ 'error' => [
+                'type'    => 'Exception',
+                'message' => $info['message'],
+            ] ];
+
+            return JsonResponse::create($json_object, $code);
         }
 
         // For model-not-found, use 404 errors.
@@ -84,8 +89,8 @@ class PlainDisplay implements DisplayContract
             $code = 404;
         }
 
-        // If it's a HTTP Exception and there is a custom view, use that.
-        if (($exception instanceof HttpException || $exception instanceof ModelNotFoundException) && $this->view->exists("errors.{$code}")) {
+        // If there is a custom view, use that.
+        if ($this->view->exists("errors.{$code}")) {
             return $this->view->make("errors.{$code}", $info)->render();
         }
 
@@ -95,7 +100,7 @@ class PlainDisplay implements DisplayContract
         }
 
         // Last resort: simply show the error code and message.
-        return sprintf('%d %s: %s', $code, $info['name'], $exception->getMessage());
+        return new Response($this->getFallbackDisplay($code, $info['name'], $info['message']), $code);
     }
 
     /**
@@ -109,15 +114,41 @@ class PlainDisplay implements DisplayContract
     protected function info($code, Exception $exception)
     {
         $description = $exception->getMessage();
+        $namespace   = 'winternight/laravel-error-handler';
 
         // If there is no error message for the given HTTP code, default to 500.
-        if (!$this->lang->has("winternight/laravel-error-handler::messages.error.{$code}.name")) {
+        if (!$this->lang->has("$namespace::messages.error.$code.name")) {
             $code = 500;
         }
 
-        $name    = $this->lang->get("winternight/laravel-error-handler::messages.error.{$code}.name");
-        $message = $this->lang->get("winternight/laravel-error-handler::messages.error.{$code}.message");
+        $name    = $this->lang->get("$namespace::messages.error.$code.name");
+        $message = $this->lang->get("$namespace::messages.error.$code.message");
 
         return compact('code', 'name', 'message', 'description');
+    }
+
+    /**
+     * Get the fallback html response content.
+     *
+     * @param string $code
+     * @param string $name
+     * @param string $message
+     *
+     * @return string
+     */
+    protected function getFallbackDisplay($code, $name, $message)
+    {
+        return <<<EOF
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="robots" content="noindex,nofollow">
+    </head>
+    <body>
+        <h1>$code $name</h1>
+        <p>$message</p>
+    </body>
+</html>
+EOF;
     }
 }

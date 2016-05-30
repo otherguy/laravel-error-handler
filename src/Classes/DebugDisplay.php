@@ -4,9 +4,9 @@ use Exception;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Http\Response;
 use Whoops\Handler\PrettyPageHandler as WhoopsHtmlHandler;
 use Whoops\Handler\JsonResponseHandler as WhoopsJsonHandler;
-use Whoops\Handler\XmlResponseHandler as WhoopsXmlHandler;
 
 use Whoops\Run as Whoops;
 
@@ -34,7 +34,12 @@ class DebugDisplay implements DisplayContract
      */
     public function display(Exception $exception, $code)
     {
-        return $this->whoops()->handleException($exception);
+        $content = $this->whoops()->handleException($exception);
+        if( $this->request->wantsJson() ) {
+            return Response::create( $content, $code )->header( 'Content-Type', 'application/json');
+        } else {
+            return Response::create( $content, $code);
+        }
     }
 
     /**
@@ -47,7 +52,6 @@ class DebugDisplay implements DisplayContract
     public function setRequest(Request $request)
     {
         $this->request = $request;
-
         return $this;
     }
 
@@ -62,14 +66,9 @@ class DebugDisplay implements DisplayContract
         $handler = new WhoopsHtmlHandler();
 
         // For JSON or XML Requests, return the proper output too.
-        if ($this->request instanceof Request) {
-            if ($this->request->wantsJson()) {
-                $handler = new WhoopsJsonHandler();
-                $handler->addTraceToOutput(true);
-            } elseif ($this->request->getContentType() == 'xml') {
-                $handler = new WhoopsXmlHandler();
-                $handler->addTraceToOutput(true);
-            }
+        if ($this->request instanceof Request && $this->request->wantsJson() ) {
+            $handler = new WhoopsJsonHandler();
+            $handler->addTraceToOutput(true);
         }
 
         // Build Whoops.
