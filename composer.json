@@ -1,42 +1,42 @@
 {
-	"name": "darkwinternight/laravel-error-handler",
-	"description": "Error handler package for the Laravel 5 framework",
-	"homepage": "https://github.com/darkwinternight/laravel-error-handler",
-	"keywords": [ "errorhandler", "error", "exception", "debug", "laravel", "laravel 5", "whoops", "ajax" ],
-	"license": "MIT",
-	"authors": [
-		{
-			"name": "Alexander Graf",
-			"email": "a.graf@aetherworld.org"
-		}
-	],
-	"require": {
-		"php": ">=5.6.0",
-        "illuminate/contracts": "5.2.*|5.3.*",
-        "illuminate/support": "5.2.*|5.3.*",
-        "symfony/debug": "^2.7|^3.0",
-        "symfony/http-foundation": "^2.7|^3.0",
-        "psr/log": "^1.0"
-	},
-    "require-dev": {
-        "filp/whoops": "^2.1"
-    },
-    "suggest": {
-        "filp/whoops": "Enables use of the debug displayer."
-    },
-	"autoload": {
-		"psr-4": {
-			"Winternight\\LaravelErrorHandler\\": "src/Winternight/LaravelErrorHandler"
-		}
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "1.x-dev"
-		}
-	},
-    "config": {
-        "preferred-install": "dist"
-    },
-	"minimum-stability": "dev",
-    "prefer-stable": true
+  "name": "darkwinternight/laravel-error-handler",
+  "description": "Error handler package for the Laravel 5 framework",
+  "homepage": "https://github.com/darkwinternight/laravel-error-handler",
+  "keywords": [ "errorhandler", "error", "exception", "debug", "laravel", "laravel 5", "whoops", "ajax" ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alexander Graf",
+      "email": "a.graf@aetherworld.org"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.0",
+    "illuminate/contracts": "5.2.*|5.3.*",
+    "illuminate/support": "5.2.*|5.3.*",
+    "symfony/debug": "^2.7|^3.0",
+    "symfony/http-foundation": "^2.7|^3.0",
+    "psr/log": "^1.0"
+  },
+  "require-dev": {
+    "filp/whoops": "^2.1"
+  },
+  "suggest": {
+    "filp/whoops": "Enables use of the debug displayer."
+  },
+  "autoload": {
+    "psr-4": {
+      "Winternight\\LaravelErrorHandler\\": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.x-dev"
+    }
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
