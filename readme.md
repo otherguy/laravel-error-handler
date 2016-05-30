@@ -169,8 +169,8 @@ $( document ).ajaxError(function( evt, xhr ) {
 ```
 
 The JSON object will always contain an `error` property which in turn will always at least contain the `type` and `message`
-properties. If debug mode is enabled, it will additionally contain the `file` and `line` properties and -- in case of an 
-Exception -- also the `trace` property. The `trace` property contains the full exception stack trace.
+properties. If debug mode is enabled, it will additionally contain the `file` and `line` properties and — in case of an 
+Exception — also the `trace` property. The `trace` property contains the full exception stack trace.
 
 ## What about errors in the console?
 
