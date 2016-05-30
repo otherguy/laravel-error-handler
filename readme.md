@@ -158,7 +158,7 @@ Whenever an AJAX request triggers the error handler, it will be recognized and t
 exchanged for a `JsonResponseHandler` that returns a JSON response that you can parse on the client side. You can read 
 [more here](https://github.com/filp/whoops/blob/master/docs/API%20Documentation.md#-whoopshandlerjsonresponsehandler).
 If debug mode is turned off, a different JSON object will be returned instead that still allows you to gracefully handle
-your AJAX errors, whle not giving out any information about your code.
+your AJAX errors, while not giving out any information about your code.
 
 Here is a (very) simple jQuery snippet for global AJAX error handling:
 
