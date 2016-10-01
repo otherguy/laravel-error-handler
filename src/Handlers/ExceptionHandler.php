@@ -13,8 +13,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
@@ -58,7 +56,7 @@ class ExceptionHandler extends BaseExceptionHandler
         $this->event     = $container->events;
         $this->container = $container;
 
-        parent::__construct($container->make(LoggerInterface::class));
+        parent::__construct($container);
     }
 
     /**
@@ -138,5 +136,21 @@ class ExceptionHandler extends BaseExceptionHandler
 
         // For production/non-debug environments, use the PlainDisplay class.
         return $this->app->make(PlainDisplay::class)->setRequest($request)->display($exception, $code);
+    }
+    
+    /**
+     * Convert an authentication exception into an unauthenticated response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @return \Illuminate\Http\Response
+     */
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'Unauthenticated.'], 401);
+        }
+
+        return redirect()->guest('login');
     }
 }

@@ -1,7 +1,6 @@
 <?php namespace Winternight\LaravelErrorHandler\Events;
 
 use Exception;
-use App\Events\Event;
 use Illuminate\Queue\SerializesModels;
 
 /**
@@ -9,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
  *
  * @package Winternight\LaravelErrorHandler\Events
  */
-class ExceptionEvent extends Event
+class ExceptionEvent
 {
     use SerializesModels;
 
