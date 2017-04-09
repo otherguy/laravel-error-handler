@@ -1,30 +1,20 @@
 <?php namespace Winternight\LaravelErrorHandler\Handlers;
 
 use Exception;
-
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as BaseExceptionHandler;
-
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
 use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
-
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Winternight\LaravelErrorHandler\Classes\PlainDisplay;
-use Winternight\LaravelErrorHandler\Classes\DebugDisplay;
-use Winternight\LaravelErrorHandler\Events\ExceptionEvent;
-
-use Illuminate\Contracts\Container\Container;
-
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Whoops\Run as Whoops;
+use Winternight\LaravelErrorHandler\Classes\DebugDisplay;
+use Winternight\LaravelErrorHandler\Classes\PlainDisplay;
+use Winternight\LaravelErrorHandler\Events\ExceptionEvent;
 
 /**
  * Class ExceptionHandler.
@@ -52,9 +42,9 @@ class ExceptionHandler extends BaseExceptionHandler
      */
     public function __construct(Container $container)
     {
-        $this->config    = $container->config;
-        $this->app       = $container->app;
-        $this->event     = $container->events;
+        $this->config = $container->config;
+        $this->app = $container->app;
+        $this->event = $container->events;
         $this->container = $container;
 
         parent::__construct($container);
@@ -84,24 +74,26 @@ class ExceptionHandler extends BaseExceptionHandler
      * @param  \Illuminate\Http\Request $request
      * @param  \Exception               $exception
      *
-     * @return \Illuminate\Http\Response
+     * @return Response|BaseResponse
      */
     public function render($request, Exception $exception)
     {
+        $exception = $this->prepareException($exception);
+
         if ($exception instanceof HttpResponseException) {
             return $exception->getResponse();
-        } elseif ($exception instanceof ModelNotFoundException) {
-            $exception = new NotFoundHttpException($exception->getMessage(), $exception);
-        } elseif ($exception instanceof AuthorizationException) {
-            $exception = new HttpException(403, $exception->getMessage());
-        } elseif ($exception instanceof ValidationException && $exception->getResponse()) {
-            return $exception->getResponse();
+        } elseif ($exception instanceof AuthenticationException) {
+            return $this->unauthenticated($request, $exception);
+        } elseif ($exception instanceof ValidationException) {
+            return $this->convertValidationExceptionToResponse($exception, $request);
+        } elseif ($this->isHttpException($exception) && $this->customErrorHtmlTemplateExists($exception)) {
+            return $this->prepareResponse($request, $exception);
         }
 
         $flattened = FlattenException::create($exception);
 
-        $code     = $flattened->getStatusCode();
-        $headers  = $flattened->getHeaders();
+        $code = $flattened->getStatusCode();
+        $headers = $flattened->getHeaders();
         $response = $this->getContent($exception, $code, $request);
 
         // If it's already a response, return that.
@@ -138,12 +130,13 @@ class ExceptionHandler extends BaseExceptionHandler
         // For production/non-debug environments, use the PlainDisplay class.
         return $this->app->make(PlainDisplay::class)->setRequest($request)->display($exception, $code);
     }
-    
+
     /**
      * Convert an authentication exception into an unauthenticated response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $exception
+     * @param  \Illuminate\Http\Request                 $request
+     * @param  \Illuminate\Auth\AuthenticationException $exception
+     *
      * @return \Illuminate\Http\Response
      */
     protected function unauthenticated($request, AuthenticationException $exception)
@@ -153,5 +146,19 @@ class ExceptionHandler extends BaseExceptionHandler
         }
 
         return redirect()->guest('login');
+    }
+
+    /**
+     * Check if custom html template exists for given exception status code
+     *
+     * @param HttpException $exception
+     *
+     * @return bool
+     */
+    protected function customErrorHtmlTemplateExists(HttpException $exception)
+    {
+        $statusCode = $exception->getStatusCode();
+
+        return view()->exists("errors/$statusCode");
     }
 }
