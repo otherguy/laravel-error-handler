@@ -1,13 +1,22 @@
+[![Maintained: no](https://img.shields.io/maintenance/no/2017.svg?style=flat-square)](http://unmaintained.tech/)
 [![Latest Stable Version](https://img.shields.io/packagist/v/winternight/laravel-error-handler.svg?style=flat-square)](https://packagist.org/packages/winternight/laravel-error-handler) [![License](https://img.shields.io/dub/l/vibe-d.svg?style=flat-square)](license.md) [![Downloads](https://img.shields.io/packagist/dt/winternight/laravel-error-handler.svg?style=flat-square)](https://packagist.org/packages/winternight/laravel-error-handler)
 
-# Laravel 5 Error Handler
+# ⚠️ No longer maintained
+
+Fortunately, [Laravel 5.5 has brought back the *Whoops* error handler](https://laravel-news.com/whoops-laravel-5-5) and this has continued throughout Laravel 5.6 and now 5.7.
+
+This repository and package can still be used for Laravel 5.2 and 5.3 and will continue to work. I will not add Laravel 5.4 support because [Laravel 5.4 itself is no longer supported](https://laravel.com/docs/5.7/releases#support-policy).
+
+Issue reports and pull requests on this repository will not be attended.
+
+# Laravel 5.2/5.3 Error Handler
 
 Unlike version 4, Laravel 5 no longer uses [Whoops](https://github.com/filp/whoops "filp/whoops") error handling out of
 the box and instead relies on the Symfony error handler, which is far less
 informative for developers.
 
 This packages provides a convenient way to get the more informative [Whoops](https://github.com/filp/whoops "filp/whoops") 
-error messages back in your Laravel 5 project, along with a few other goodies.
+error messages back in your Laravel 5.2/5.3 project, along with a few other goodies.
 
 ![Exception](screenshot.png "The Whoops Error Handler in Action!" )
 
